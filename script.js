@@ -23,13 +23,13 @@ const asignaturas = [
     { nombre: "Matemáticas", inicio: 41, fin: 62 },
     { nombre: "Español", inicio: 63, fin: 80 },
     { nombre: "Biología", inicio: 81, fin: 90 },
-    { font: "Historia Universal", nombre: "Historia Universal", inicio: 91, fin: 100 },
+    { nombre: "Historia Universal", inicio: 91, fin: 100 },
     { nombre: "Historia de México", inicio: 101, fin: 110 },
     { nombre: "Filosofía", inicio: 111, fin: 120 }
 ];
 
 // --- Variables de Estado del Sistema ---
-let tiempoRestante = 180 * 60; // 180 minutos en segundos
+let tiempoRestante = 180 * 60; 
 let intervaloCronometro = null;
 let intervaloAutoGuardado = null;
 let examenIniciado = false;
@@ -48,21 +48,18 @@ const progressBarFill = document.getElementById("progress-bar-fill");
 const btnFinish = document.getElementById("btn-finish");
 const btnRestart = document.getElementById("btn-restart");
 
-// --- Inicialización al Cargar la Página ---
+// --- Inicialización ---
 document.addEventListener("DOMContentLoaded", () => {
     generarHojaRespuestas();
     verificarSesionExistente();
     
-    // Eventos
     loginForm.addEventListener("submit", procesarLogin);
     btnFinish.addEventListener("click", clickFinalizarExamen);
     btnRestart.addEventListener("click", reiniciarSimulador);
-    
-    // Escuchar cambios en las respuestas para actualizar indicadores visuales
     questionsGrid.addEventListener("change", actualizarProgreso);
 });
 
-// --- Generar Formulario Dinámico de 120 Preguntas ---
+// --- Generar Formulario Dinámico ---
 function generarHojaRespuestas() {
     questionsGrid.innerHTML = "";
     for (let i = 1; i <= 120; i++) {
@@ -83,13 +80,12 @@ function generarHojaRespuestas() {
     }
 }
 
-// --- Control de Acceso (Login) ---
+// --- Control de Acceso ---
 function procesarLogin(e) {
     e.preventDefault();
     const usuarioInput = document.getElementById("email").value.trim();
     const passwordInput = document.getElementById("password").value;
 
-    // Validación según requerimientos temporales
     if (usuarioInput === "admin" && passwordInput === "123") {
         loginError.classList.add("hidden");
         iniciarExamen();
@@ -98,25 +94,21 @@ function procesarLogin(e) {
     }
 }
 
-// --- Flujo de Inicio del Examen ---
+// --- Flujo de Inicio ---
 function iniciarExamen() {
     loginContainer.classList.add("hidden");
     examContainer.classList.remove("hidden");
     examenIniciado = true;
     
-    // Recuperar datos si existen de una sesión previa activa
     cargarRespuestasGuardadas();
-    
-    // Configurar componentes en ejecución
     comenzarCronometro();
     activarDeteccionFraude();
     
-    // Configurar temporizador de guardado automático (cada 10 segundos)
     intervaloAutoGuardado = setInterval(guardarProgresoEnStorage, 10000);
     actualizarProgreso();
 }
 
-// --- Gestión del Reloj Regresivo ---
+// --- Gestión del Reloj ---
 function comenzarCronometro() {
     actualizarInterfazReloj();
     intervaloCronometro = setInterval(() => {
@@ -126,7 +118,7 @@ function comenzarCronometro() {
         if (tiempoRestante <= 0) {
             clearInterval(intervaloCronometro);
             alert("El tiempo del examen ha expirado. Tus respuestas se calificarán de forma automática.");
-            finalizarExamen(true);
+            finalizarExamen(false);
         }
     }, 1000);
 }
@@ -136,14 +128,11 @@ function actualizarInterfazReloj() {
     const minutos = Math.floor((tiempoRestante % 3600) / 60);
     const segundos = tiempoRestante % 60;
     
-    const formatoHH = String(horas).padStart(2, "0");
-    const formatoMM = String(minutos).padStart(2, "0");
-    const formatoSS = String(segundos).padStart(2, "0");
-    
-    timerDisplay.textContent = `${formatoHH}:${formatoMM}:${formatoSS}`;
+    timerDisplay.textContent = 
+        `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}:${String(segundos).padStart(2, "0")}`;
 }
 
-// --- Métodos de UX: Indicadores de Progreso ---
+// --- UX: Indicadores de Progreso ---
 function actualizarProgreso() {
     let contestadas = 0;
     for (let i = 1; i <= 120; i++) {
@@ -159,33 +148,46 @@ function actualizarProgreso() {
     }
     
     progressText.textContent = `Contestadas: ${contestadas} / 120`;
-    const porcentaje = (contestadas / 120) * 100;
-    progressBarFill.style.width = `${porcentaje}%`;
+    progressBarFill.style.width = `${(contestadas / 120) * 100}%`;
 }
 
-// --- Sistema de Seguridad (Anti-Fraude) ---
+// --- Sistema Anti-Fraude (Optimizado contra falsos positivos) ---
 function activarDeteccionFraude() {
-    // API de Visibilidad del documento
     document.addEventListener("visibilitychange", ejecutarAccionFraude);
-    // Evento de desenfoque de la ventana del navegador
-    window.addEventListener("blur", ejecutarAccionFraude);
+    window.addEventListener("blur", controlarBlurFoco);
 }
 
 function desactivarDeteccionFraude() {
     document.removeEventListener("visibilitychange", ejecutarAccionFraude);
-    window.removeEventListener("blur", ejecutarAccionFraude);
+    window.removeEventListener("blur", controlarBlurFoco);
+}
+
+function controlarBlurFoco() {
+    if (examenFinalizado || !examenIniciado) return;
+
+    // Pequeño delay estratégico para evaluar a dónde se movió el foco real del documento
+    setTimeout(() => {
+        // Si el foco pasó a un IFRAME (herramientas internas del visor PDF), ignoramos la sanción
+        if (document.activeElement && document.activeElement.tagName === "IFRAME") {
+            return; 
+        }
+
+        // Si cambió a un programa o pestaña externa, aplica sanción directa
+        desactivarDeteccionFraude();
+        alert("Se detectó salida del examen. El examen será finalizado automáticamente.");
+        finalizarExamen(true);
+    }, 150);
 }
 
 function ejecutarAccionFraude() {
-    // Evitar ejecuciones si el examen ya se cerró previamente
     if (examenFinalizado || !examenIniciado) return;
     
     desactivarDeteccionFraude();
     alert("Se detectó salida del examen. El examen será finalizado automáticamente.");
-    finalizarExamen(true); // Forzar finalización sin guardar cambios extra
+    finalizarExamen(true);
 }
 
-// --- Persistencia en LocalStorage (Guardado automático) ---
+// --- Persistencia en LocalStorage ---
 function guardarProgresoEnStorage() {
     if (!examenIniciado || examenFinalizado) return;
     
@@ -197,13 +199,11 @@ function guardarProgresoEnStorage() {
         }
     }
     
-    const snapshot = {
+    localStorage.setItem("unam_simulador_state", JSON.stringify({
         respuestas: respuestasUsuario,
         tiempo: tiempoRestante,
         sesionActiva: true
-    };
-    
-    localStorage.setItem("unam_simulador_state", JSON.stringify(snapshot));
+    }));
 }
 
 function cargarRespuestasGuardadas() {
@@ -219,13 +219,11 @@ function cargarRespuestasGuardadas() {
             for (const preguntaId in respuestas) {
                 const valor = respuestas[preguntaId];
                 const inputElement = document.querySelector(`input[name="q${preguntaId}"][value="${valor}"]`);
-                if (inputElement) {
-                    inputElement.checked = true;
-                }
+                if (inputElement) inputElement.checked = true;
             }
         }
     } catch (e) {
-        console.error("Error al restaurar los datos del LocalStorage", e);
+        console.error("Error restaurando LocalStorage", e);
     }
 }
 
@@ -233,14 +231,11 @@ function verificarSesionExistente() {
     const backupRaw = localStorage.getItem("unam_simulador_state");
     if (backupRaw) {
         const backup = JSON.parse(backupRaw);
-        if (backup && backup.sesionActiva) {
-            // Saltarse el login si el usuario refrescó la página en pleno examen
-            iniciarExamen();
-        }
+        if (backup && backup.sesionActiva) iniciarExamen();
     }
 }
 
-// --- Flujo de Cierre y Calificación del Examen ---
+// --- Cierre y Calificación ---
 function clickFinalizarExamen() {
     if (confirm("¿Estás seguro de que deseas finalizar tu examen? Ya no podrás cambiar tus respuestas.")) {
         finalizarExamen(false);
@@ -254,43 +249,33 @@ function finalizarExamen(forzadoPorFraude = false) {
     clearInterval(intervaloCronometro);
     clearInterval(intervaloAutoGuardado);
     
-    // Bloquear todas las opciones de la hoja de respuestas
-    const inputs = questionsGrid.querySelectorAll("input");
-    inputs.forEach(input => input.disabled = true);
+    questionsGrid.querySelectorAll("input").forEach(input => input.disabled = true);
     
-    // Extraer respuestas finales del usuario
     const respuestasUsuarioFinales = {};
     for (let i = 1; i <= 120; i++) {
         const radio = document.querySelector(`input[name="q${i}"]:checked`);
         respuestasUsuarioFinales[i] = radio ? radio.value : "Sin responder";
     }
     
-    // Limpiar estado en LocalStorage
     localStorage.removeItem("unam_simulador_state");
     
-    // Cambiar de pantalla
     examContainer.classList.add("hidden");
     resultsContainer.classList.remove("hidden");
     
-    // Procesar Datos Estadísticos
     calcularYMostrarResultados(respuestasUsuarioFinales);
 }
 
 function obtenerMateriaDePregunta(numero) {
     for (const materia of asignaturas) {
-        if (numero >= materia.inicio && numero <= materia.fin) {
-            return materia.nombre;
-        }
+        if (numero >= materia.inicio && numero <= materia.fin) return materia.nombre;
     }
     return "Desconocida";
 }
 
-// --- Lógica del Motor de Calificación Automática ---
 function calcularYMostrarResultados(respuestasUsuario) {
     let aciertosGlobales = 0;
     let erroresGlobales = 0;
     
-    // Estructura para almacenar estadísticas por asignatura
     const estadisticasMaterias = {};
     asignaturas.forEach(m => {
         estadisticasMaterias[m.nombre] = { aciertos: 0, total: (m.fin - m.inicio) + 1 };
@@ -299,7 +284,6 @@ function calcularYMostrarResultados(respuestasUsuario) {
     const detailedTableBody = document.getElementById("detailed-table").querySelector("tbody");
     detailedTableBody.innerHTML = "";
     
-    // Evaluar las 120 preguntas
     for (let i = 1; i <= 120; i++) {
         const correcta = respuestasCorrectas[i];
         const usuario = respuestasUsuario[i];
@@ -323,7 +307,6 @@ function calcularYMostrarResultados(respuestasUsuario) {
             erroresGlobales++;
         }
         
-        // Agregar fila al reporte detallado
         const filaDetalle = document.createElement("tr");
         filaDetalle.innerHTML = `
             <td>${i}</td>
@@ -335,15 +318,10 @@ function calcularYMostrarResultados(respuestasUsuario) {
         detailedTableBody.appendChild(filaDetalle);
     }
     
-    // Actualizar Resumen Global
-    const totalPreguntas = 120;
-    const porcentajeGlobalCalculado = ((aciertosGlobales / totalPreguntas) * 100).toFixed(1);
-    
     document.getElementById("total-correct").textContent = aciertosGlobales;
     document.getElementById("total-incorrect").textContent = erroresGlobales;
-    document.getElementById("global-percentage").textContent = `${porcentajeGlobalCalculado}%`;
+    document.getElementById("global-percentage").textContent = `${((aciertosGlobales / 120) * 100).toFixed(1)}%`;
     
-    // Construir Tabla resumida por Asignatura
     const subjectTableBody = document.getElementById("subject-table").querySelector("tbody");
     subjectTableBody.innerHTML = "";
     
@@ -362,19 +340,14 @@ function calcularYMostrarResultados(respuestasUsuario) {
     });
 }
 
-// --- Reinicio del Sistema ---
 function reiniciarSimulador() {
-    // Restablecer todas las variables globales de control
     tiempoRestante = 180 * 60;
     examenIniciado = false;
     examenFinalizado = false;
     
     localStorage.removeItem("unam_simulador_state");
-    
-    // Limpiar formulario y regenerar inputs limpios
     generarHojaRespuestas();
     
-    // Alternar visibilidad de contenedores para volver al Login original
     resultsContainer.classList.add("hidden");
     loginContainer.classList.remove("hidden");
     loginForm.reset();
