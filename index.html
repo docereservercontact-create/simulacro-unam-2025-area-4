@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Examen UNAM</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="login-container" class="auth-wrapper">
+        <div class="auth-card">
+            <h2>Simulador UNAM</h2>
+            <p class="subtitle">Ingresa tus credenciales para iniciar el examen</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Correo electrónico / Usuario:</label>
+                    <input type="text" id="email" required placeholder="ejemplo@correo.com o admin" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <div id="login-error" class="error-message hidden">
+                    Credenciales incorrectas. Inténtalo de nuevo.
+                </div>
+                <button type="submit" class="btn-primary">Iniciar Examen</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="exam-container" class="exam-wrapper hidden">
+        <header class="fixed-header">
+            <div class="header-brand">
+                <h1>Examen de Simulación UNAM</h1>
+            </div>
+            <div class="header-status">
+                <div class="progress-indicator">
+                    <span id="progress-text">Contestadas: 0 / 120</span>
+                    <div class="progress-bar-bg">
+                        <div id="progress-bar-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div id="timer" class="timer-display">03:00:00</div>
+                <button id="btn-finish" class="btn-danger">Finalizar Examen</button>
+            </div>
+        </header>
+
+        <main class="main-layout">
+            <section class="pdf-panel">
+                <iframe src="examen.pdf" title="Cuadernillo de Preguntas"></iframe>
+            </section>
+
+            <section class="answers-panel">
+                <h3>Hoja de Respuestas</h3>
+                <p class="instructions">Selecciona la opción correcta para cada pregunta conforme avances en el PDF.</p>
+                <form id="sheet-form">
+                    <div id="questions-grid" class="questions-container">
+                        </div>
+                </form>
+            </section>
+        </main>
+
+        <footer class="periodic-table-panel">
+            <h3>Material de Apoyo: Tabla Periódica</h3>
+            <div class="pdf-footer-wrapper">
+                <iframe src="tabla_periodica.pdf" title="Tabla Periódica de los Elementos"></iframe>
+            </div>
+        </footer>
+    </div>
+
+    <div id="results-container" class="results-wrapper hidden">
+        <div class="results-card">
+            <h2>Resultados del Examen</h2>
+            <hr>
+            
+            <div class="global-summary">
+                <div class="summary-box correct">
+                    <span class="summary-label">Aciertos</span>
+                    <span id="total-correct" class="summary-value">0</span>
+                </div>
+                <div class="summary-box incorrect">
+                    <span class="summary-label">Errores</span>
+                    <span id="total-incorrect" class="summary-value">0</span>
+                </div>
+                <div class="summary-box score">
+                    <span class="summary-label">Porcentaje Global</span>
+                    <span id="global-percentage" class="summary-value">0%</span>
+                </div>
+            </div>
+
+            <h3>Desglose por Materia</h3>
+            <div class="table-responsive">
+                <table id="subject-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Materia</th>
+                            <th>Aciertos</th>
+                            <th>Total</th>
+                            <th>Porcentaje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+
+            <h3>Reporte Detallado</h3>
+            <div class="table-responsive max-height-table">
+                <table id="detailed-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Pregunta</th>
+                            <th>Materia</th>
+                            <th>Respuesta Correcta</th>
+                            <th>Tu Respuesta</th>
+                            <th>Resultado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="results-actions">
+                <button id="btn-restart" class="btn-primary">Reiniciar Simulador</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
