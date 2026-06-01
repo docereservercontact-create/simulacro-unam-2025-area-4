@@ -122,12 +122,12 @@ body {
     background-color: #c95a3e;
 }
 
-/* --- 2. Interfaz del Examen (Layout Principal) --- */
+/* --- 2. Interfaz del Examen (Layout Principal Corregido) --- */
 .exam-wrapper {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding-top: 80px; /* Margen para evitar colisión con el header fijo */
+    padding-top: 80px; 
 }
 
 /* Encabezado Fijo */
@@ -192,12 +192,12 @@ body {
     border: 1px solid var(--secondary-color);
 }
 
-/* Grid Dividido (PDF | Respuestas) */
+/* Grid Dividido Altura Optimizada */
 .main-layout {
     display: flex;
     flex: 1;
-    height: calc(100vh - 80px); /* Ajuste según altura del Header */
-    overflow: hidden;
+    height: 82vh; /* Altura prolongada y cómoda para el visor */
+    overflow: visible; /* Permite scroll general hacia la tabla periódica */
 }
 
 .pdf-panel {
@@ -217,7 +217,7 @@ body {
     height: 100%;
     background-color: var(--white);
     padding: 24px;
-    overflow-y: auto; /* Scroll Independiente */
+    overflow-y: auto; /* Scroll Independiente para la hoja de respuestas */
 }
 
 .answers-panel h3 {
@@ -288,7 +288,7 @@ body {
 
 .pdf-footer-wrapper {
     width: 100%;
-    height: 600px; /* Altura cómoda para visualización horizontal */
+    height: 650px; 
 }
 
 .pdf-footer-wrapper iframe {
@@ -355,7 +355,6 @@ body {
     padding-left: 10px;
 }
 
-/* Tablas semánticas */
 .table-responsive {
     width: 100%;
     overflow-x: auto;
@@ -391,7 +390,6 @@ body {
     background-color: var(--light-bg);
 }
 
-/* Estados en Reporte Detallado */
 .status-correct { color: #2e7d32; font-weight: bold; }
 .status-incorrect { color: #c62828; font-weight: bold; }
 .status-unanswered { color: #757575; font-style: italic; }
@@ -406,7 +404,7 @@ body {
     max-width: 250px;
 }
 
-/* --- Media Queries (Adaptación Responsiva) --- */
+/* --- Media Queries (Responsivo) --- */
 @media (max-width: 992px) {
     .main-layout {
         flex-direction: column;
@@ -416,7 +414,7 @@ body {
     
     .pdf-panel {
         width: 100%;
-        height: 500px;
+        height: 600px;
     }
     
     .answers-panel {
@@ -425,16 +423,8 @@ body {
         border-top: 4px solid var(--primary-color);
     }
     
-    .fixed-header {
-        padding: 0 15px;
-    }
-    
-    .header-brand h1 {
-        font-size: 16px;
-    }
-    
     .progress-indicator {
-        display: none; /* Simplificación en pantallas medianas/móviles */
+        display: none;
     }
 }
 
@@ -458,9 +448,5 @@ body {
     
     .global-summary {
         flex-direction: column;
-    }
-    
-    .options-group {
-        gap: 8px;
     }
 }
