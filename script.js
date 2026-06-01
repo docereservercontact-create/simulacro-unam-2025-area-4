@@ -68,12 +68,12 @@ function generarHojaRespuestas() {
         row.id = `row-q-${i}`;
         
         row.innerHTML = `
-            <span class="question-number">${i}.</span>
+            <span class="question-number">${i}</span>
             <div class="options-group">
-                <label class="option-label"><input type="radio" name="q${i}" value="A"> A</label>
-                <label class="option-label"><input type="radio" name="q${i}" value="B"> B</label>
-                <label class="option-label"><input type="radio" name="q${i}" value="C"> C</label>
-                <label class="option-label"><input type="radio" name="q${i}" value="D"> D</label>
+                <label class="option-label"><input type="radio" name="q${i}" value="A">A</label>
+                <label class="option-label"><input type="radio" name="q${i}" value="B">B</label>
+                <label class="option-label"><input type="radio" name="q${i}" value="C">C</label>
+                <label class="option-label"><input type="radio" name="q${i}" value="D">D</label>
             </div>
         `;
         questionsGrid.appendChild(row);
@@ -148,10 +148,12 @@ function actualizarProgreso() {
     }
     
     progressText.textContent = `Contestadas: ${contestadas} / 120`;
-    progressBarFill.style.width = `${(contestadas / 120) * 100}%`;
+    if (progressBarFill) {
+        progressBarFill.style.width = `${(contestadas / 120) * 100}%`;
+    }
 }
 
-// --- Sistema Anti-Fraude (Optimizado contra falsos positivos) ---
+// --- Sistema Anti-Fraude (Optimizado contra clics de visualizadores de PDF) ---
 function activarDeteccionFraude() {
     document.addEventListener("visibilitychange", ejecutarAccionFraude);
     window.addEventListener("blur", controlarBlurFoco);
@@ -165,14 +167,14 @@ function desactivarDeteccionFraude() {
 function controlarBlurFoco() {
     if (examenFinalizado || !examenIniciado) return;
 
-    // Pequeño delay estratégico para evaluar a dónde se movió el foco real del documento
+    // Margen estratégico para evaluar el elemento que tomó foco en el navegador
     setTimeout(() => {
-        // Si el foco pasó a un IFRAME (herramientas internas del visor PDF), ignoramos la sanción
+        // Si el usuario clickeó en el iframe de preguntas o tabla periódica, ignoramos la trampa
         if (document.activeElement && document.activeElement.tagName === "IFRAME") {
             return; 
         }
 
-        // Si cambió a un programa o pestaña externa, aplica sanción directa
+        // Si realmente cambió a una aplicación externa o escritorio: sanción
         desactivarDeteccionFraude();
         alert("Se detectó salida del examen. El examen será finalizado automáticamente.");
         finalizarExamen(true);
@@ -231,7 +233,9 @@ function verificarSesionExistente() {
     const backupRaw = localStorage.getItem("unam_simulador_state");
     if (backupRaw) {
         const backup = JSON.parse(backupRaw);
-        if (backup && backup.sesionActiva) iniciarExamen();
+        if (backup && backup.sesionActiva) {
+            iniciarExamen();
+        }
     }
 }
 
@@ -262,6 +266,7 @@ function finalizarExamen(forzadoPorFraude = false) {
     examContainer.classList.add("hidden");
     resultsContainer.classList.remove("hidden");
     
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     calcularYMostrarResultados(respuestasUsuarioFinales);
 }
 
