@@ -1,0 +1,466 @@
+/* --- Variables del Sistema --- */
+:root {
+    --primary-color: #0d3b66;
+    --secondary-color: #f4d35e;
+    --success-color: #2a9d8f;
+    --danger-color: #e76f51;
+    --light-bg: #f8f9fa;
+    --white: #ffffff;
+    --dark-text: #2b2d42;
+    --border-color: #dee2e6;
+}
+
+/* --- Estilos Generales --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    line-height: 1.5;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --- 1. Pantalla de Acceso --- */
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #1d4e89 100%);
+}
+
+.auth-card {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-card h2 {
+    color: var(--primary-color);
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.auth-card .subtitle {
+    font-size: 14px;
+    color: #6c757d;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* --- Botones --- */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 4px;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #0a2e52;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: var(--white);
+    border: none;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background-color: #c95a3e;
+}
+
+/* --- 2. Interfaz del Examen (Layout Principal) --- */
+.exam-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: 80px; /* Margen para evitar colisión con el header fijo */
+}
+
+/* Encabezado Fijo */
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background-color: var(--primary-color);
+    color: var(--white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.header-brand h1 {
+    font-size: 20px;
+}
+
+.header-status {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.progress-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 200px;
+}
+
+.progress-text {
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 8px;
+    background-color: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#progress-bar-fill {
+    height: 100%;
+    background-color: var(--secondary-color);
+    transition: width 0.3s;
+}
+
+.timer-display {
+    font-family: monospace;
+    font-size: 24px;
+    background-color: rgba(0,0,0,0.2);
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--secondary-color);
+}
+
+/* Grid Dividido (PDF | Respuestas) */
+.main-layout {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 80px); /* Ajuste según altura del Header */
+    overflow: hidden;
+}
+
+.pdf-panel {
+    width: 60%;
+    height: 100%;
+    border-right: 2px solid var(--border-color);
+}
+
+.pdf-panel iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.answers-panel {
+    width: 40%;
+    height: 100%;
+    background-color: var(--white);
+    padding: 24px;
+    overflow-y: auto; /* Scroll Independiente */
+}
+
+.answers-panel h3 {
+    margin-bottom: 8px;
+    color: var(--primary-color);
+}
+
+.instructions {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+/* Filas de Preguntas */
+.questions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.question-row {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.question-row.answered {
+    background-color: #f1f9f6;
+}
+
+.question-number {
+    font-weight: bold;
+    min-width: 40px;
+}
+
+.options-group {
+    display: flex;
+    gap: 15px;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.option-label input {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+/* Footer de la Tabla Periódica */
+.periodic-table-panel {
+    background-color: #e9ecef;
+    padding: 30px;
+    border-top: 3px solid var(--primary-color);
+}
+
+.periodic-table-panel h3 {
+    margin-bottom: 15px;
+    color: var(--primary-color);
+}
+
+.pdf-footer-wrapper {
+    width: 100%;
+    height: 600px; /* Altura cómoda para visualización horizontal */
+}
+
+.pdf-footer-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* --- 3. Pantalla de Resultados --- */
+.results-wrapper {
+    padding: 40px 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.results-card {
+    background-color: var(--white);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.results-card h2 {
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.global-summary {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.summary-box {
+    flex: 1;
+    padding: 20px;
+    border-radius: 6px;
+    text-align: center;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+}
+
+.summary-box.correct { background-color: #e8f5e9; color: #2e7d32; }
+.summary-box.incorrect { background-color: #ffebee; color: #c62828; }
+.summary-box.score { background-color: #e3f2fd; color: #1565c0; }
+
+.summary-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.summary-value {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.results-card h3 {
+    margin: 30px 0 15px 0;
+    color: var(--primary-color);
+    border-left: 4px solid var(--secondary-color);
+    padding-left: 10px;
+}
+
+/* Tablas semánticas */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.max-height-table {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.data-table th, .data-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+    background-color: var(--primary-color);
+    color: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: var(--light-bg);
+}
+
+/* Estados en Reporte Detallado */
+.status-correct { color: #2e7d32; font-weight: bold; }
+.status-incorrect { color: #c62828; font-weight: bold; }
+.status-unanswered { color: #757575; font-style: italic; }
+
+.results-actions {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.results-actions .btn-primary {
+    max-width: 250px;
+}
+
+/* --- Media Queries (Adaptación Responsiva) --- */
+@media (max-width: 992px) {
+    .main-layout {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+    }
+    
+    .pdf-panel {
+        width: 100%;
+        height: 500px;
+    }
+    
+    .answers-panel {
+        width: 100%;
+        height: 500px;
+        border-top: 4px solid var(--primary-color);
+    }
+    
+    .fixed-header {
+        padding: 0 15px;
+    }
+    
+    .header-brand h1 {
+        font-size: 16px;
+    }
+    
+    .progress-indicator {
+        display: none; /* Simplificación en pantallas medianas/móviles */
+    }
+}
+
+@media (max-width: 576px) {
+    .fixed-header {
+        height: auto;
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .exam-wrapper {
+        padding-top: 140px;
+    }
+    
+    .header-status {
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    
+    .global-summary {
+        flex-direction: column;
+    }
+    
+    .options-group {
+        gap: 8px;
+    }
+}
